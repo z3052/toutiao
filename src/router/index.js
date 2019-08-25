@@ -6,6 +6,8 @@ import Home from '@/views/home'
 import Welcome from '@/views/welcome'
 import NotFound from '@/views/404'
 
+import store from '@/store'
+
 Vue.use(VueRouter)
 
 const router = new VueRouter({
@@ -15,12 +17,17 @@ const router = new VueRouter({
       path: '/',
       component: Home,
       children: [
-        // 欢迎页面  如果子路由有名字  父级路由需要删除
         { path: '/', name: 'welcome', component: Welcome }
       ]
     },
     { path: '*', name: '404', component: NotFound }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  const user = store.getUser()
+  if (to.path !== '/login' && !user.token) return next('/login')
+  next()
 })
 
 export default router
