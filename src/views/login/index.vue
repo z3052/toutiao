@@ -45,7 +45,7 @@ export default {
     return {
       // 表单数据对象
       loginForm: {
-        mobile: '13911111111',
+        mobile: '18340323052',
         code: '246810'
       },
       // 校验规则对象
@@ -69,28 +69,35 @@ export default {
       // 1. 给表单组件加ref属性   ref="loginForm"
       // 2. 获取组件实例（dom对象）
       // 3. 调用校验函数
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.loginForm.validate(async valid => {
         if (valid) {
           // 进行登录即可
           // 调用接口，简单配置axios
           // 需要接口文档  信息： 地址 请求方式  传参 返回数据
           // 成功 跳转到首页
           // 失败 提示错误
-          this.$http
-            .post(
-              'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
-              this.loginForm
-            )
-            .then(res => {
-              // 成功 res 对象响应对象 res.data 主体
-              // 保存  用户信息（token） 获取响应主体下data对象
-              store.setUser(res.data.data)
-              this.$router.push('/')
-            })
-            .catch(() => {
-              // 失败
-              this.$message.error('手机号或验证码错误')
-            })
+          // this.$http
+          //   .post(
+          //     'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
+          //     this.loginForm
+          //   )
+          //   .then(res => {
+          //     // 成功 res 对象响应对象 res.data 主体
+          //     // 保存  用户信息（token） 获取响应主体下data对象
+          //     store.setUser(res.data.data)
+          //     this.$router.push('/')
+          //   })
+          //   .catch(() => {
+          //     // 失败
+          //     this.$message.error('手机号或验证码错误')
+          //   })
+          try {
+            const { data: { data } } = await this.$http.post('authorizations', this.loginForm)
+            store.setUser(data)
+            this.$router.push('/')
+          } catch (e) {
+            this.$message.error('手机号或验证码错误')
+          }
         }
       })
     }
