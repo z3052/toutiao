@@ -54,7 +54,8 @@ export default {
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
           // 手机格式校验  没有提供默认的校验规则  change 值改变触发
-          { validator: checkMobile, trigger: 'change' }
+          { validator: checkMobile, trigger: 'change' },
+          { validator: checkMobile, trigger: 'blur' }
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -91,11 +92,23 @@ export default {
           //     // 失败
           //     this.$message.error('手机号或验证码错误')
           //   })
+
+          // 使用 async await 发请求
+
+          // 解构赋值
+          // 得到 用户 信息  res.data.data  res = {data:{data:'用户信息',message:'提示'}}
+          // 以前获取对象中的属性值：res.data ={data:'用户信息'}
+          // ES6提供解构赋值语法：{data:{data:data}}
+
+          // 捕获异常
+          // 使用 try{ //当代码可能发生错误 }catch(err){ //触发catch函数 捕获到异常（报错） }
+          // await接受成功的结果，那么失败怎么办？
           try {
             const { data: { data } } = await this.$http.post('authorizations', this.loginForm)
             store.setUser(data)
             this.$router.push('/')
           } catch (e) {
+            // 提示
             this.$message.error('手机号或验证码错误')
           }
         }

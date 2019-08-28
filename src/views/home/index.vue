@@ -3,7 +3,7 @@
     <el-aside :width="isCollapse?'64px':'200px'">
         <div class="logo" :class="{miniLogo:isCollapse}"></div>
          <el-menu
-        default-active="/"
+        :default-active="$route.path"
         class="el-menu-vertical-demo"
         background-color="#002033"
         text-color="#fff"
@@ -85,6 +85,7 @@ export default {
       this.$router.push('/setting')
     },
     logout () {
+      store.delUser()
       this.$router.push('/login')
     },
     toggleMenu () {
