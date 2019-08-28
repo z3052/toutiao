@@ -2,14 +2,36 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Login from '@/views/login'
+import Home from '@/views/home'
+import Welcome from '@/views/welcome'
+import NotFound from '@/views/404'
+import Test from '@/views/test'
+import Article from '@/views/article'
+
+import store from '@/store'
 
 Vue.use(VueRouter)
 
 const router = new VueRouter({
-  // 路由规则
   routes: [
-    { path: '/login', name: 'login', component: Login }
+    { path: '/login', name: 'login', component: Login },
+    {
+      path: '/',
+      component: Home,
+      children: [
+        { path: '/', name: 'welcome', component: Welcome },
+        { path: '/article', name: 'article', component: Article }
+      ]
+    },
+    { path: '/test', name: 'test', component: Test },
+    { path: '*', name: '404', component: NotFound }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  const user = store.getUser()
+  if (to.path !== '/login' && !user.token) return next('/login')
+  next()
 })
 
 export default router

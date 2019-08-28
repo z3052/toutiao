@@ -1,13 +1,20 @@
 <template>
-  <div class='container'>
+
+  <div class="container">
+    <!-- 卡片 element-ui 组件 -->
     <el-card class="my-card">
-      <img src="../../assets/images/logo_index.png" alt="">
+      <img src="../../assets/images/logo_index.png" alt />
+
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" status-icon>
         <el-form-item prop="mobile">
           <el-input v-model="loginForm.mobile" placeholder="请输入手机号"></el-input>
         </el-form-item>
         <el-form-item prop="code">
-          <el-input v-model="loginForm.code" placeholder="请输入验证码" style="width:236px;margin-right:10px"></el-input>
+          <el-input
+            v-model="loginForm.code"
+            placeholder="请输入验证码"
+            style="width:236px;margin-right:10px"
+          ></el-input>
           <el-button>发送验证码</el-button>
         </el-form-item>
         <el-form-item>
@@ -22,23 +29,38 @@
 </template>
 
 <script>
+
+import store from '@/store'
 export default {
   data () {
+    // 定义校验函数  先申明
+    // 1. 三个参数
+    // 2. rule 校验规则对象  value 当前字段值 callback 校验后回调函数
+    // 3. callback() 成功  callback(new Error('显示错误提示信息'))
     const checkMobile = (rule, value, callback) => {
+      // 自己校验逻辑   必须是手机号格式：第一个数字 1 第二个数字 3-9  最后其它9个数字
       if (!/^1[3-9]\d{9}$/.test(value)) {
-        return callback(new Error('手机号码格式不正确'))
+        // 格式不对
+        return callback(new Error('手机号格式不对'))
       }
       callback()
     }
     return {
+
+      // 表单数据对象
       loginForm: {
-        mobile: '',
-        code: ''
+        mobile: '18340323052',
+        code: '246810'
       },
+      // 校验规则对象
       loginRules: {
+        // 定义字段对应的校验规则(多种)
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { validator: checkMobile, trigger: 'change' }
+          // 手机格式校验  没有提供默认的校验规则  change 值改变触发
+          { validator: checkMobile, trigger: 'change' },
+          { validator: checkMobile, trigger: 'blur' }
+
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -49,23 +71,16 @@ export default {
   },
   methods: {
     login () {
-      this.$refs.loginForm.validate((valid) => {
+      this.$refs.loginForm.validate(async valid => {
         if (valid) {
-          this.$refs.loginForm.validate(valid => {
-            if (valid) {
-              this.$http
-                .post(
-                  'http://ttapi.research.itcast.cn/mp/v1_0/authorizations',
-                  this.loginForm
-                )
-                .then(res => {
-                  this.$router.push('/')
-                })
-                .catch(() => {
-                  this.$message.error('手机号或验证码错误')
-                })
-            }
-          })
+          try {
+            const { data: { data } } = await this.$http.post('authorizations', this.loginForm)
+            store.setUser(data)
+            this.$router.push('/')
+          } catch (e) {
+            // 提示
+            this.$message.error('手机号或验证码错误')
+          }
         }
       })
     }
@@ -74,20 +89,24 @@ export default {
 </script>
 
 <style scoped lang='less'>
-.container{
+
+.container {
+
   width: 100%;
   height: 100%;
   position: absolute;
   left: 0;
   top: 0;
   background: url(../../assets/images/login_bg.jpg) no-repeat center / cover;
-  .my-card{
+
+  .my-card {
     width: 400px;
     height: 350px;
     position: absolute;
-    left:50%;
-    top:50%;
-    transform: translate(-50%,-50%);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
     img {
       display: block;
       width: 200px;
